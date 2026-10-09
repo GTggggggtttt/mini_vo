@@ -1,0 +1,19 @@
+# CMake build output and compiled learning examples
+/build/
+/build-*/
+/cmake-build-*/
+/pre-test/bin/
+*.o
+*.a
+*.so
+*.so.*
+
+# Crash dumps
+core
+core.*
+
+# Local editor and agent configuration
+/.vscode/
+/.agents/
+/.codex/
+/.aws/
