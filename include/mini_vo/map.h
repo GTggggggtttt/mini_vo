@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include "mini_vo/mappoint.h"
+#include "mini_vo/keyframe.h"
 
 namespace mini_vo
 {
@@ -152,7 +153,44 @@ namespace mini_vo
          *
          * 修改 Map 自己的容器结构。
          */
-        const MapPointContainer& mapPoints() const;
+        const MapPointContainer &mapPoints() const;
+
+        /*
+         * ================================================================
+         * KeyFrame Container
+         * ================================================================
+         *
+         * Map 是 KeyFrame 的长期拥有者。
+         */
+        using KeyFrameContainer = std::unordered_map<unsigned long, KeyFrame::Ptr>;
+
+        /*
+         * 插入关键帧。
+         *
+         * 不允许：
+         *   nullptr
+         *   重复 KeyFrame ID
+         */
+        bool InsertKeyFrame(const KeyFrame::Ptr &keyframe);
+
+        /*
+         * 根据 KeyFrame ID 查找。
+         *
+         * 找不到返回 nullptr。
+         */
+        KeyFrame::Ptr GetKeyFrame(unsigned long id) const;
+        /*
+         * 只读访问关键帧容器。
+         */
+        const KeyFrameContainer &keyFrames() const;
+
+        /*
+         * 当前 KeyFrame 数量。
+         *
+         * 注意：
+         *   Map::size() 继续表示 MapPoint 数量。
+         */
+        std::size_t keyFrameCount() const;
 
         std::size_t size() const;
 
@@ -162,6 +200,11 @@ namespace mini_vo
 
     private:
         MapPointContainer map_points_;
+
+        /*
+         * 长期保存关键帧。
+         */
+        KeyFrameContainer key_frames_;
     };
 
 }

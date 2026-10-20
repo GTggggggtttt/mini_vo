@@ -5,128 +5,80 @@
 #include "mini_vo/frontend.h"
 #include "mini_vo/stereo_camera.h"
 
-
-int main(int argc,char** arg)
+int main(int argc, char **argv)
 {
     if (argc != 2)
     {
-        std::cerr
-            << "Usage: "
-            << argv[0]
-            << " <euroc_dataset_path>"
-            << std::endl;
-
+        std::cerr << "Usage: " << argv[0] << " <euroc_dataset_path>" << std::endl;
         return 1;
     }
-
 
     /*
      * ============================================================
      * Dataset
      * ============================================================
      */
-    mini_vo::Dataset dataset(
-        argv[1]
-    );
-
+    mini_vo::Dataset dataset(argv[1]);
 
     if (!dataset.Init())
     {
-        std::cerr
-            << "Dataset initialization failed."
-            << std::endl;
-
+        std::cerr << "Dataset initialization failed." << std::endl;
         return 1;
     }
 
+    auto left_camera = dataset.leftCamera();
 
-    auto left_camera =
-        dataset.leftCamera();
+    auto right_camera = dataset.rightCamera();
 
-
-    auto right_camera =
-        dataset.rightCamera();
-
-
-    if (!left_camera ||
-        !right_camera)
+    if (!left_camera || !right_camera)
     {
         return 1;
     }
 
-
-    mini_vo::StereoCamera stereo_camera(
-        left_camera,
-        right_camera
-    );
-
+    mini_vo::StereoCamera stereo_camera(left_camera,right_camera);
 
     /*
      * ============================================================
      * Frame 0
      * ============================================================
      */
-    auto frame0 =
-        dataset.NextFrame();
-
+    auto frame0 = dataset.NextFrame();
 
     if (!frame0)
     {
         return 1;
     }
 
-
-    if (!stereo_camera.InitRectification(
-            frame0->leftImage().size()))
+    if (!stereo_camera.InitRectification(frame0->leftImage().size()))
     {
         return 1;
     }
-
 
     cv::Mat left0;
-
     cv::Mat right0;
 
-
-    if (!stereo_camera.Rectify(
-            frame0->leftImage(),
-            frame0->rightImage(),
-            left0,
-            right0))
+    if (!stereo_camera.Rectify( frame0->leftImage(),frame0->rightImage(),left0,right0))
     {
         return 1;
     }
 
-
-    mini_vo::Frontend frontend(
-        1000
-    );
-
+    mini_vo::Frontend frontend(1000);
 
     /*
      * Frame0 ORB。
      */
-    if (!frontend.ExtractStereoFeatures(
-            left0,
-            right0))
+    if (!frontend.ExtractStereoFeatures(left0,right0))
     {
         return 1;
     }
 
-
-    const auto& frame0_features =
-        frontend.leftFeatures();
-
+    const auto &frame0_features =frontend.leftFeatures();
 
     if (frame0_features.empty())
     {
-        std::cerr
-            << "Frame0 has no feature."
-            << std::endl;
-
+        std::cerr<< "Frame0 has no feature."<< std::endl;
         return 1;
     }
-
 
     /*
      * ============================================================
@@ -136,20 +88,13 @@ int main(int argc,char** arg)
      * shared_ptr 会让这个 Feature
      * 在 Frontend 处理下一帧后仍然活着。
      */
-    auto feature0 =
-        frame0_features.front();
+    auto feature0 =frame0_features.front();
 
-
-    if (!feature0 ||
-        !feature0->hasDescriptor())
+    if (!feature0 ||!feature0->hasDescriptor())
     {
-        std::cerr
-            << "Frame0 feature has no descriptor."
-            << std::endl;
-
+        std::cerr<< "Frame0 feature has no descriptor."<< std::endl;
         return 1;
     }
-
 
     /*
      * 保存一份 descriptor 内容，
@@ -160,27 +105,24 @@ int main(int argc,char** arg)
             ->descriptor()
             .clone();
 
-
     /*
      * 保存 Feature descriptor 的 buffer 地址。
      */
-    const unsigned char*
+    const unsigned char *
         feature_buffer_before =
             feature0
                 ->descriptor()
                 .data;
 
-
     /*
      * Frontend 当前大 descriptor matrix
      * 的 buffer 地址。
      */
-    const unsigned char*
+    const unsigned char *
         frontend_buffer_before =
             frontend
                 .leftDescriptors()
                 .data;
-
 
     std::cout
         << "Frame0 feature descriptor: "
@@ -189,12 +131,10 @@ int main(int argc,char** arg)
         << feature0->descriptor().cols
         << '\n';
 
-
     std::cout
         << "Type = "
         << feature0->descriptor().type()
         << '\n';
-
 
     /*
      * ============================================================
@@ -210,19 +150,15 @@ int main(int argc,char** arg)
      */
     std::cout
         << "Feature buffer  : "
-        << static_cast<const void*>(
-            feature_buffer_before
-        )
+        << static_cast<const void *>(
+               feature_buffer_before)
         << '\n';
-
 
     std::cout
         << "Frontend buffer : "
-        << static_cast<const void*>(
-            frontend_buffer_before
-        )
+        << static_cast<const void *>(
+               frontend_buffer_before)
         << '\n';
-
 
     /*
      * ============================================================
@@ -232,17 +168,14 @@ int main(int argc,char** arg)
     auto frame1 =
         dataset.NextFrame();
 
-
     if (!frame1)
     {
         return 1;
     }
 
-
     cv::Mat left1;
 
     cv::Mat right1;
-
 
     if (!stereo_camera.Rectify(
             frame1->leftImage(),
@@ -252,7 +185,6 @@ int main(int argc,char** arg)
     {
         return 1;
     }
-
 
     /*
      * ============================================================
@@ -275,7 +207,6 @@ int main(int argc,char** arg)
         return 1;
     }
 
-
     /*
      * ============================================================
      * 验证 Frame0 Feature descriptor 仍然有效
@@ -290,30 +221,24 @@ int main(int argc,char** arg)
         return 1;
     }
 
-
     const double descriptor_difference =
         cv::norm(
             descriptor_before,
             feature0->descriptor(),
-            cv::NORM_HAMMING
-        );
-
+            cv::NORM_HAMMING);
 
     std::cout
         << "\nAfter processing Frame1:\n";
-
 
     std::cout
         << "Frame0 Feature still has descriptor: "
         << feature0->hasDescriptor()
         << '\n';
 
-
     std::cout
         << "Descriptor difference = "
         << descriptor_difference
         << '\n';
-
 
     /*
      * descriptor 内容不应该改变。
@@ -326,7 +251,6 @@ int main(int argc,char** arg)
 
         return 1;
     }
-
 
     /*
      * ORB descriptor 应该是 1x32。
@@ -341,11 +265,9 @@ int main(int argc,char** arg)
         return 1;
     }
 
-
     std::cout
         << "\nFeature V3 descriptor test passed."
         << std::endl;
-
 
     return 0;
 }

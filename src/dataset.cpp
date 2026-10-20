@@ -158,10 +158,8 @@ namespace mini_vo
 
     bool Dataset::Init()
     {
-        // 【修正 2】初始化失败时，不允许读取半成品数据或报告正常结束。
         initialized_ = false;
 
-        // 【修正 4】重新初始化时清空旧数据，避免 CSV 内容重复追加。
         current_image_index_ = 0;
         left_image_files_.clear();
         right_image_files_.clear();

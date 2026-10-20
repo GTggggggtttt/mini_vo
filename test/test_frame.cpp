@@ -44,7 +44,7 @@ int main()
 
      frame.setPose(T_cw);
 
-    std::cout<<"\nUpdated T_cw:\n"<<frame.pose()<<'/n';
+    std::cout<<"\nUpdated T_cw:\n"<<frame.pose()<<'\n';
 
     //检查pose
     const double error = (frame.pose()  - T_cw).norm();

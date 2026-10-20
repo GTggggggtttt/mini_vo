@@ -39,9 +39,6 @@ find_package(OpenCV REQUIRED)
 # ================================================================
 # mini_vo 核心库
 # ================================================================
-#
-# Camera 和 Frame 都属于我们自己的 VO 核心代码。
-#
 add_library(mini_vo
     src/camera.cpp
     src/frame.cpp
@@ -51,6 +48,13 @@ add_library(mini_vo
     src/mappoint.cpp
     src/map.cpp
     src/feature.cpp
+    src/temporal_matcher.cpp
+    src/pnp_tracker.cpp
+    src/map_initializer.cpp
+    src/multi_frame_tracker.cpp
+    src/stereo_map_updater.cpp
+    src/keyframe.cpp
+    src/keyframe_selector.cpp
 )
 
 
@@ -226,6 +230,112 @@ test/test_map_initialization.cpp)
 
 target_link_libraries(
     test_map_initialization
+    PRIVATE
+    mini_vo
+)
+
+# ================================================================
+# test_feature_descriptor
+# ================================================================
+add_executable(
+    test_feature_descriptor
+    test/test_feature_descriptor.cpp
+)
+
+target_link_libraries(
+    test_feature_descriptor
+    PRIVATE
+    mini_vo
+)
+
+# ================================================================
+# Temporal Matching V1
+# ================================================================
+
+add_executable(
+    test_temporal_matching
+    test/test_temporal_matching.cpp
+)
+
+target_link_libraries(
+    test_temporal_matching
+    PRIVATE
+    mini_vo
+)
+
+# ================================================================
+# PnP Tracking V1
+# ================================================================
+
+add_executable(
+    test_pnp_tracking
+    test/test_pnp_tracking.cpp
+)
+
+target_link_libraries(
+    test_pnp_tracking
+    PRIVATE
+    mini_vo
+)
+
+
+# ================================================================
+# Multi-frame Tracking V1
+# ================================================================
+
+add_executable(
+    test_multi_frame_tracking
+    test/test_multi_frame_tracking.cpp
+)
+
+target_link_libraries(
+    test_multi_frame_tracking
+    PRIVATE
+    mini_vo
+)
+
+# ================================================================
+# Multi-frame Tracking V2
+# ================================================================
+
+add_executable(
+    test_multi_frame_tracking_v2
+    test/test_multi_frame_tracking_v2.cpp
+)
+
+target_link_libraries(
+    test_multi_frame_tracking_v2
+    PRIVATE
+    mini_vo
+)
+
+# ================================================================
+# KeyFrame V1 Unit Test
+# ================================================================
+
+add_executable(
+    test_keyframe
+    test/test_keyframe.cpp
+)
+
+target_link_libraries(
+    test_keyframe
+    PRIVATE
+    mini_vo
+)
+
+
+# ================================================================
+# KeyFrame Tracking Integration Test
+# ================================================================
+
+add_executable(
+    test_keyframe_tracking
+    test/test_keyframe_tracking.cpp
+)
+
+target_link_libraries(
+    test_keyframe_tracking
     PRIVATE
     mini_vo
 )

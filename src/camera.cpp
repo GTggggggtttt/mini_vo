@@ -25,7 +25,7 @@ namespace mini_vo
         const double x=(pixel.x()-cx_)*depth/fx_;
         const double y =(pixel.y()-cy_)*depth/fy_;
         return Eigen::Vector3d(x,y,depth);
-    };
+    }
 
     //同样是理想的针孔摄像头
     Eigen::Vector2d Camera::Camera2Pixel(const Eigen::Vector3d&point)const

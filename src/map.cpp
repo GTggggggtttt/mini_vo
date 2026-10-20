@@ -58,20 +58,91 @@ namespace mini_vo
          */
         const auto iterator = map_points_.find(id);
 
-        if(iterator == map_points_.end())
+        if (iterator == map_points_.end())
         {
             return nullptr;
         }
 
         return iterator->second;
-
     }
 
-    const Map::MapPointContainer& Map::mapPoints() const{return map_points_;}
+    /*
+     * ================================================================
+     * InsertKeyFrame
+     * ================================================================
+     */
+    bool Map::InsertKeyFrame(const KeyFrame::Ptr &keyframe)
+    {
+        if (!keyframe)
+        {
+            return false;
+        }
+        /*
+         * unordered_map::emplace()
+         *
+         * 若 ID 已存在，不覆盖原来的 KeyFrame。
+         *
+         * second:
+         *   true  插入成功
+         *   false ID 冲突
+         */
+        const auto result = key_frames_.emplace(keyframe->id(), keyframe);
+        return result.second;
+    }
 
-    std::size_t Map::size() const{return map_points_.size();}
+    /*
+     * ================================================================
+     * GetKeyFrame
+     * ================================================================
+     */
+    KeyFrame::Ptr Map::GetKeyFrame(unsigned long id) const
+    {
+        const auto it = key_frames_.find(id);
+        if (it == key_frames_.end())
+        {
+            return nullptr;
+        }
+        return it->second;
+    }
 
-    bool Map::empty() const {return map_points_.empty();}
+    /*
+     * ================================================================
+     * keyFrames
+     * ================================================================
+     */
+    const Map::KeyFrameContainer &Map::keyFrames() const
+    {
+        return key_frames_;
+    }
 
-    void Map::Clear() { map_points_.clear();}
-}//namespace mini_vo
+    /*
+     * ================================================================
+     * keyFramecount
+     * ================================================================
+     */
+
+    std::size_t Map::keyFrameCount() const
+    {
+        return key_frames_.size();
+    }
+
+    const Map::MapPointContainer &Map::mapPoints() const { return map_points_; }
+
+    std::size_t Map::size() const { return map_points_.size(); }
+
+    bool Map::empty() const { return map_points_.empty(); }
+
+    void Map::Clear()
+    {
+        /*
+         * Map 不再持有关键帧。
+         *
+         * 如果外部还有 shared_ptr，
+         * KeyFrame 仍然可能存活。
+         */
+        key_frames_.clear();
+
+        // Map不再持有地图点
+        map_points_.clear();
+    }
+} // namespace mini_vo
