@@ -117,22 +117,22 @@ target_link_libraries(test_frame
 
 #dataset_test
 add_executable(test_dataset
-test/test_dataset.cpp)
+    test/test_dataset.cpp)
 
 target_link_libraries(test_dataset
- PRIVATE
- mini_vo
+    PRIVATE
+    mini_vo
 )
 
 # ================================================================
 # Calibration Test
 # ================================================================
 add_executable(test_calibration
-test/test_calibration.cpp)
+    test/test_calibration.cpp)
 
 target_link_libraries(test_calibration
-PRIVATE
-mini_vo
+    PRIVATE
+    mini_vo
 )
 
 # ================================================================
@@ -226,7 +226,7 @@ target_link_libraries(
 # Initial Map Test
 # ================================================================
 add_executable(test_map_initialization
-test/test_map_initialization.cpp)
+    test/test_map_initialization.cpp)
 
 target_link_libraries(
     test_map_initialization
@@ -338,4 +338,45 @@ target_link_libraries(
     test_keyframe_tracking
     PRIVATE
     mini_vo
+)
+
+# ================================================================
+# MapPoint Observation V1 Unit Test
+# ================================================================
+
+add_executable(
+    test_mappoint_observation
+    test/test_mappoint_observation.cpp
+)
+
+target_link_libraries(
+    test_mappoint_observation
+    PRIVATE
+    mini_vo
+)
+
+
+# ================================================================
+# MapPoint Observation V1 Integration Test
+# ================================================================
+
+add_executable(
+    test_observation_tracking
+    test/test_observation_tracking.cpp
+)
+
+target_link_libraries(
+    test_observation_tracking
+    PRIVATE
+    mini_vo
+)
+
+# 让测试源码可以使用：
+#
+# #include "common/euroc_test_context.h"
+#
+target_include_directories(
+    test_observation_tracking
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/test
 )
